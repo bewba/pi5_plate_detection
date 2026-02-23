@@ -11,11 +11,10 @@ training data taken from roboflow
 
 TechStack: 
 
-Hardware: 
-Raspberry pi 5
-Raspberry pi camera v2.1
+Hardware:\n
+Raspberry pi 5\n
+Raspberry pi camera v2.1\n
 
-Software: 
-
-Yolo v11
-Easy OCR
+Software:\n
+Yolo v11\n
+Easy OCR\n
