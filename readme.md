@@ -39,3 +39,6 @@ verify using `python verify.py`
 
 Normal test_model.py: 65.51 seconds
 Multithread test_multithread.py: 21.95 seconds
+
+
+### Model was made very strict as cars are expected to not be moving; as such, in earlier iterations, the model was able to detect plate numbers quite easily. I deliberately made it in a way that it would be harder to detect plates to avoid false positives.
