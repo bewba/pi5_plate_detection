@@ -8,13 +8,10 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import threading
 import queue
-import time 
 
 # -------------------------
 # 1. Setup
 # -------------------------
-
-start_time = time.time()
 model = YOLO('./runs/detect/license_plate_detector/weights/best.pt')
 model.to('cpu')
 
@@ -34,11 +31,11 @@ os.makedirs(plate_save_dir, exist_ok=True)
 # -------------------------
 # 2. Tuning knobs  ← adjust these to trade speed vs accuracy
 # -------------------------
-DETECT_EVERY_N_FRAMES = 2      # Run YOLO every N frames; interpolate boxes in between
+DETECT_EVERY_N_FRAMES = 2     # Run YOLO every N frames; interpolate boxes in between
 OCR_EVERY_N_FRAMES    = 3      # Submit an OCR job for each plate every N frames
 OCR_WORKERS           = 3      # Parallel OCR threads (tune to your CPU core count)
-REQUIRED_FRAMES       = 5      # Frames needed for consensus check
-CONSENSUS_THRESHOLD   = 0.95   # 95% of frames must agree
+REQUIRED_FRAMES       = 3      # Frames needed for consensus check
+CONSENSUS_THRESHOLD   = 1   # 100% of frames must agree
 MIN_OCR_CONF          = 0.50   # Minimum single-frame OCR confidence to count
 YOLO_CONF             = 0.70
 MIN_PLATE_W           = 120
@@ -206,6 +203,8 @@ while cap.isOpened():
         data = active_plates[pid]
         data['pending_ocr'] = False
 
+        if text:
+            print(f"    [OCR] pid={pid} '{text}' conf={conf:.2f} buf={len(data['ocr_buffer'])}")
         if text and conf >= MIN_OCR_CONF:
             data['ocr_buffer'].append((text, conf))
             if conf > data['best_conf']:
@@ -228,7 +227,7 @@ while cap.isOpened():
                 data['ocr_done']        = True
                 data['confirmed_label'] = label
 
-                best_crop = data['best_frame'] or crop
+                best_crop = data['best_frame'] if data['best_frame'] is not None else crop
                 x1, y1, x2, y2 = data['box']
 
                 # Save plate crop
@@ -297,7 +296,3 @@ executor.shutdown(wait=True)
 cap.release()
 out.release()
 print(f"\nDone! {plate_counter} plates saved → {run_dir}")
-
-end_time = time.time()
-elapsed = end_time - start_time
-print(f"Processing time: {elapsed:.2f} seconds")
