@@ -1,3 +1,16 @@
-roboflow
+# PRIMARY: Look here first for AMD/ROCm compatible wheels
+--index-url https://download.pytorch.org/whl/rocm6.2
+
+# SECONDARY: Fall back here for everything else (ultralytics, etc.)
+--extra-index-url https://pypi.org/simple
+
+# Core packages (will be pulled from ROCm index)
+torch
+torchvision
+torchaudio
+
+# Standard packages (will be pulled from PyPI)
 ultralytics
 opencv-python
+pyyaml
+easyocr

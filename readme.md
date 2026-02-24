@@ -5,7 +5,7 @@ Built specifically to work with a raspberry pi
 training data taken from roboflow
 
 ## Activate virtual environment
-`source yolov11_env/bin/activate`
+`source yolov11_amd_env/bin/activate`
 
 ## Install dependencies
 `pip install -r requirements.txt`
@@ -15,6 +15,9 @@ training data taken from roboflow
 
 ## Download dataset
 `python dl.py`
+
+## Train Model
+`python train_model.py`
 
 
 ## Tech Stack
@@ -26,3 +29,9 @@ training data taken from roboflow
 ### Software:
 - YOLOv11
 - EasyOCR
+
+### Hans Specifics
+- Trained on a RX 6600XT, packages would be changed under an NVDA GPU
+- fedora linux
+
+verify using `python verify.py`
