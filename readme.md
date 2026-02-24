@@ -35,3 +35,7 @@ training data taken from roboflow
 - fedora linux
 
 verify using `python verify.py`
+
+
+Normal test_model.py: 65.51 seconds
+Multithread test_multithread.py: 21.95 seconds
