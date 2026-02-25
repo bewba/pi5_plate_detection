@@ -12,7 +12,7 @@ import queue
 # -------------------------
 # 1. Setup
 # -------------------------
-model = YOLO('./runs/detect/license_plate_detector/weights/best.pt')
+model = YOLO('./runs/detect/license_plate_detector/weights/best.onnx')
 model.to('cpu')
 
 # Single shared reader — safe to call from multiple threads once created.
@@ -31,12 +31,12 @@ os.makedirs(plate_save_dir, exist_ok=True)
 # -------------------------
 # 2. Tuning knobs  ← adjust these to trade speed vs accuracy
 # -------------------------
-DETECT_EVERY_N_FRAMES = 2     # Run YOLO every N frames; interpolate boxes in between
-OCR_EVERY_N_FRAMES    = 3      # Submit an OCR job for each plate every N frames
-OCR_WORKERS           = 3      # Parallel OCR threads (tune to your CPU core count)
-REQUIRED_FRAMES       = 3      # Frames needed for consensus check
+DETECT_EVERY_N_FRAMES = 3     # Run YOLO every N frames; interpolate boxes in between
+OCR_EVERY_N_FRAMES    = 2      # Submit an OCR job for each plate every N frames
+OCR_WORKERS           = 2      # Parallel OCR threads (tune to your CPU core count)
+REQUIRED_FRAMES       = 2      # Frames needed for consensus check
 CONSENSUS_THRESHOLD   = 1   # 100% of frames must agree
-MIN_OCR_CONF          = 0.50   # Minimum single-frame OCR confidence to count
+MIN_OCR_CONF          = 0.70   # Minimum single-frame OCR confidence to count
 YOLO_CONF             = 0.70
 MIN_PLATE_W           = 120
 MIN_PLATE_H           = 40
