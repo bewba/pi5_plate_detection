@@ -12,13 +12,13 @@ from concurrent.futures import ThreadPoolExecutor
 # 1. Setup & Config
 # -------------------------
 
-DETECT_EVERY_N_FRAMES  = 3      # Run YOLO every N frames
-OCR_EVERY_N_FRAMES     = 1      # Submit OCR job every N frames per tracked plate
+DETECT_EVERY_N_FRAMES  = 2      # Run YOLO every N frames
+OCR_EVERY_N_FRAMES     = 2      # Submit OCR job every N frames per tracked plate
 OCR_WORKERS            = 2      # Parallel OCR threads
 REQUIRED_FRAMES        = 3      # Frames needed for consensus
 CONSENSUS_THRESHOLD    = 0.66   # 66% of frames must agree on text
-MIN_OCR_CONF           = 0.85   # Minimum single-frame OCR confidence to count
-YOLO_CONF              = 0.70
+MIN_OCR_CONF           = 0.85   # How sure the model is that the text is correct
+YOLO_CONF              = 0.70   # How sure the model is that the object is a plate
 YOLO_INPUT_SIZE        = 320
 MIN_PLATE_W            = 0
 MIN_PLATE_H            = 0
@@ -30,7 +30,7 @@ WINDOW_NAME = 'License Plate Detector  —  press Q to quit'
 
 # Filipino plate formats: LLL NNN or LLLL NNNN (no hyphens, no special chars)
 # Space is optional since OCR may or may not detect the gap
-_PH_PLATE_RE = re.compile(r'^([A-Z]{3,4})\s*(\d{3,4})$')
+_PH_PLATE_RE = re.compile(r'^([A-Z]{3,4})\s([0-9]{3,4})$')
 
 # Allowlist: letters + digits only — NO hyphen, Filipino plates don't use it
 _OCR_ALLOWLIST = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -40,16 +40,14 @@ def normalize_plate(raw: str):
     Clean raw OCR text and validate against Filipino plate format.
     Returns canonical 'LLL NNN' / 'LLLL NNNN' string, or None if invalid.
     """
-    # Strip everything except alphanumeric (remove accidental hyphens, dots, spaces first)
+    # Only keep alphanumeric + spaces
     clean = ''.join(c for c in raw.upper() if c.isalnum() or c == ' ').strip()
-    # Also try without the space in case OCR merged both halves
-    compact = ''.join(c for c in clean if c.isalnum())
 
-    for candidate in (clean, compact):
-        m = _PH_PLATE_RE.match(candidate.strip())
-        if m:
-            letters, numbers = m.group(1), m.group(2)
-            return f"{letters} {numbers}"   # canonical form with a single space
+    # Only check with space present
+    m = _PH_PLATE_RE.match(clean)
+    if m:
+        letters, numbers = m.group(1), m.group(2)
+        return f"{letters} {numbers}"   # canonical form with a single space
 
     return None  # did not match LLL NNN or LLLL NNNN
 
